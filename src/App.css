@@ -3,3 +3,10 @@
 #main {
   margin-top: 4rem;
 }
+
+.locate-icon {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 100;
+}

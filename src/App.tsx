@@ -390,6 +390,22 @@ class App extends React.PureComponent<{}, State> {
         <Dimmer active={this.state.loading} page>
           <Loader />
         </Dimmer>
+        <Popup
+          basic
+          trigger={
+            <Icon
+              className="locate-icon "
+              size="big"
+              circular
+              inverted
+              link
+              color="grey"
+              name="location arrow"
+              onClick={this.sortByGeolocation}
+            />
+          }
+          content="定位顯示離自己最近的藥局"
+        />
         <Menu borderless fixed="top">
           <Menu.Item>
             <Form onSubmit={this.onSubmit}>
@@ -403,11 +419,6 @@ class App extends React.PureComponent<{}, State> {
                 placeholder="搜尋藥局名稱或地址"
               />
             </Form>
-          </Menu.Item>
-          <Menu.Item style={{ marginLeft: "1.6rem" }}>
-            <Button onClick={this.sortByGeolocation} basic>
-              距離現在位置最近
-            </Button>
           </Menu.Item>
         </Menu>
         <Segment id="main">
