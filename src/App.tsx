@@ -12,41 +12,15 @@ import {
   Menu,
   Popup,
   Segment,
-  Table
+  Table,
+  Message
 } from "semantic-ui-react";
 
-import { cleanDateString, calcCrow } from "./util";
+import { Pharmacy, PharmacyAjaxResponse } from "./Model";
+import GoogleMap from "./Map";
+import { cleanDateString, calcCrow, getPosition } from "./util";
 
 import "./App.css";
-
-type PharmacyAjaxResponse = {
-  type: string;
-  features: Pharmacy[];
-};
-
-type Pharmacy = {
-  type: string;
-  properties: PharmacyProps;
-  geometry: Geometry;
-};
-
-type PharmacyProps = {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  mask_adult: number;
-  mask_child: number;
-  updated?: string;
-  available: string;
-  mark_adult: number;
-  mark_child: number;
-};
-
-type Geometry = {
-  type: string;
-  coordinates: number[];
-};
 
 type State = {
   pharmacies: Pharmacy[];
@@ -65,6 +39,7 @@ type State = {
   numberLeft: number;
   availableNums: number;
   pageNums: number;
+  mapView: boolean;
 };
 
 type Condition = {
@@ -79,7 +54,7 @@ class App extends React.PureComponent<{}, State> {
   public pageLimit: number = 5;
 
   public state = {
-    ajaxError: false,
+    ajaxError: true,
     notFoundError: false,
     pharmacies: [],
     loading: true,
@@ -95,7 +70,8 @@ class App extends React.PureComponent<{}, State> {
     startPage: 1,
     numberLeft: 0,
     availableNums: 0,
-    pageNums: 0
+    pageNums: 0,
+    mapView: true
   };
 
   public async componentDidMount() {
@@ -147,12 +123,6 @@ class App extends React.PureComponent<{}, State> {
   public updatePageNumber(newLength: number) {
     this.setState({
       pageNums: Math.ceil(newLength / this.state.pageSize)
-    });
-  }
-
-  public getPosition(): Promise<Position> {
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject);
     });
   }
 
@@ -285,7 +255,7 @@ class App extends React.PureComponent<{}, State> {
 
   private sortByGeolocation = async () => {
     try {
-      const location = await this.getPosition();
+      const location = await getPosition();
       const { latitude, longitude } = location.coords;
       const indexList = (this.state.display as number[]).slice();
       const distanceMap = new Map<number, number>();
@@ -384,29 +354,50 @@ class App extends React.PureComponent<{}, State> {
     });
   };
 
+  public toggleMapView = () => {
+    this.setState({
+      mapView: !this.state.mapView
+    });
+  };
+
   public render() {
-    return (
+    if (this.state.ajaxError) {
+      return (
+        <Segment>
+          <Message error>
+            <Message.Header>無法與伺服器連線</Message.Header>
+            <Message.Content>
+              發生錯誤的原因可能有以下：
+              <Message.List>
+                <Message.Item>
+                  口罩之亂已經結束，負責供應訊息的伺服器已經關閉。
+                </Message.Item>
+                <Message.Item>
+                  您的網路有問題，請您移致收訊好的地方。
+                </Message.Item>
+                <Message.Item>
+                  如果以上都無法解決您的問題，請聯繫 honesty1997@gmail.com
+                </Message.Item>
+              </Message.List>
+            </Message.Content>
+          </Message>
+        </Segment>
+      );
+    }
+    const table = (
       <>
-        <Dimmer active={this.state.loading} page>
-          <Loader />
-        </Dimmer>
-        <Popup
-          basic
-          trigger={
-            <Icon
-              className="locate-icon "
-              size="big"
-              circular
-              inverted
-              link
-              color="grey"
-              name="location arrow"
-              onClick={this.sortByGeolocation}
-            />
-          }
-          content="定位顯示離自己最近的藥局"
-        />
-        <Menu borderless fixed="top">
+        <Button
+          className="locate-icon"
+          icon
+          labelPosition="left"
+          color="facebook"
+          onClick={this.sortByGeolocation}
+        >
+          定位最近的藥局
+          <Icon name="location arrow" />
+        </Button>
+
+        <Menu style={{ zIndex: 0 }} borderless fixed="top" secondary>
           <Menu.Item>
             <Form onSubmit={this.onSubmit}>
               <Input
@@ -419,6 +410,12 @@ class App extends React.PureComponent<{}, State> {
                 placeholder="搜尋藥局名稱或地址"
               />
             </Form>
+          </Menu.Item>
+          <Menu.Item
+            style={{ marginLeft: "3rem" }}
+            onClick={this.toggleMapView}
+          >
+            顯示Google地圖
           </Menu.Item>
         </Menu>
         <Segment id="main">
@@ -489,6 +486,19 @@ class App extends React.PureComponent<{}, State> {
             </Table.Footer>
           </Table>
         </Segment>
+      </>
+    );
+
+    return (
+      <>
+        <Dimmer active={this.state.loading} page>
+          <Loader />
+        </Dimmer>
+        {this.state.mapView ? (
+          <GoogleMap pharmacies={this.state.pharmacies} />
+        ) : (
+          table
+        )}
       </>
     );
   }

@@ -5,8 +5,31 @@
 }
 
 .locate-icon {
-  position: fixed;
+  position: fixed !important;
   bottom: 1rem;
   right: 1rem;
-  z-index: 100;
+  z-index: 20;
+}
+
+#root {
+  height: 100%;
+}
+
+#map-root {
+  z-index: 30;
+  width: 100%;
+  height: 100%;
+}
+
+#map-root .locate-icon {
+  z-index: 40;
+}
+
+.info-box {
+  width: 30rem;
+  height: 20rem;
+}
+
+#legend {
+  z-index: 80;
 }

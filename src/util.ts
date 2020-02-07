@@ -31,3 +31,9 @@ export function calcCrow(
 function toRad(Value: number): number {
   return (Value * Math.PI) / 180;
 }
+
+export function getPosition(): Promise<Position> {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+}
