@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "22a6c9af82c403bc55d86fccb5f011f3",
+    "revision": "a4d48d9b3b2c12dbf7d0905a6dcbe827",
     "url": "/2020-tw-mask-map/index.html"
   },
   {
