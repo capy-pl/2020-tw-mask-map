@@ -48,13 +48,6 @@ export default class GoogleMap extends React.PureComponent<Props> {
       this.map = new google.maps.Map(this.rootRef.current, opt);
       this.map.addListener("center_changed", this.onCenterChange());
       this.drawMarkers();
-      if (this.legendRef && this.legendRef.current) {
-        this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(
-          this.legendRef.current
-        );
-      }
-
-      // this.props.pharmacies.slice(0, 10).forEach(this.drawMarker);
     }
   }
 
@@ -133,7 +126,7 @@ export default class GoogleMap extends React.PureComponent<Props> {
   }
 
   public drawMarkers = () => {
-    const sortedMap = this.sortedDistanceMap().slice(0, 50);
+    const sortedMap = this.sortedDistanceMap().slice(0, 30);
     // clear all previous markers
     const notInList: number[] = [];
     this.markers.forEach((marker, id) => {
@@ -245,7 +238,7 @@ export default class GoogleMap extends React.PureComponent<Props> {
     return (
       <>
         <div id="legend" ref={this.legendRef}>
-          <Segment compact>
+          <Segment compact style={{ padding: "0.4rem" }}>
             <List verticalAlign="middle">
               <List.Item>
                 <Image src={MaskUnderTen} size="mini" />

@@ -2,6 +2,7 @@
 
 #main {
   margin-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 .locate-icon {
@@ -39,4 +40,7 @@
 
 #legend {
   z-index: 80;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
