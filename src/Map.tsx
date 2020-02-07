@@ -10,6 +10,7 @@ import { Button, Icon, Segment, List, Image } from "semantic-ui-react";
 
 type Props = {
   pharmacies: Pharmacy[];
+  toggleMapView: () => void;
 };
 
 type MaskSituation = "enough" | "lessThanTen" | "none";
@@ -19,6 +20,7 @@ export default class GoogleMap extends React.PureComponent<Props> {
   public legendRef = React.createRef<HTMLDivElement>();
   private map?: google.maps.Map;
   private markers: Map<number, google.maps.Marker> = new Map();
+  private currentOpen?: google.maps.InfoWindow;
 
   public async componentDidMount() {
     if (this.rootRef && this.rootRef.current) {
@@ -170,37 +172,41 @@ export default class GoogleMap extends React.PureComponent<Props> {
           <h3 class="ui top attached header">
             ${pharmacy.properties.name}
           </h3>
-          <table class="ui celled table">
+          <table class="ui celled table compact">
           <tbody>
+          <tr>
+          <td class="collapsing ${this.getCellClass(
+            adultMaskAvailable
+          )}">成人口罩庫存</td>
+          <td data-label="availabe adult masks" class=" ${this.getCellClass(
+            adultMaskAvailable
+          )} collapsing">${pharmacy.properties.mask_adult}</td>
+        </tr>
+        <tr>
+          <td class="collapsing  ${this.getCellClass(
+            childMaskAvailable
+          )}" >孩童口罩庫存</td>
+          <td data-label="available child masks" class="${this.getCellClass(
+            childMaskAvailable
+          )} collapsing">${pharmacy.properties.mask_child}</td>
+        </tr>
             <tr class="collapsing">
               <td class="collapsing">地址</td>
-              <td data-label="address">${pharmacy.properties.address}</td>
+              <td class="collapsing" data-label="address">${
+                pharmacy.properties.address
+              }</td>
             </tr>
             <tr class="collapsing">
               <td  class="collapsing">電話</td>
-              <td data-label="phone number">${pharmacy.properties.phone}</td>
+              <td class="collapsing" data-label="phone number">${
+                pharmacy.properties.phone
+              }</td>
             </tr>
             <tr>
               <td class="collapsing">最後更新時間</td>
-              <td data-label="last update">${cleanDateString(
+              <td class="collapsing" data-label="last update">${cleanDateString(
                 pharmacy.properties.updated || ""
               )}</td>
-            </tr>
-            <tr>
-              <td class="collapsing ${this.getCellClass(
-                adultMaskAvailable
-              )}">成人口罩庫存</td>
-              <td data-label="availabe adult masks" class=" ${this.getCellClass(
-                adultMaskAvailable
-              )}">${pharmacy.properties.mask_adult}</td>
-            </tr>
-            <tr>
-              <td class="collapsing  ${this.getCellClass(
-                childMaskAvailable
-              )}" >孩童口罩庫存</td>
-              <td data-label="available child masks" class="${this.getCellClass(
-                childMaskAvailable
-              )}">${pharmacy.properties.mask_child}</td>
             </tr>
           </tbody>
         </table>
@@ -222,6 +228,10 @@ export default class GoogleMap extends React.PureComponent<Props> {
       });
 
       marker.addListener("click", () => {
+        if (this.currentOpen) {
+          this.currentOpen.close();
+        }
+        this.currentOpen = infowindow;
         infowindow.open(this.map, marker);
       });
 
@@ -270,7 +280,13 @@ export default class GoogleMap extends React.PureComponent<Props> {
           顯示我的位置
           <Icon name="location arrow" />
         </Button>
-
+        <Button
+          style={{ zIndex: 40 }}
+          className="toggle-map-icon"
+          onClick={this.props.toggleMapView}
+        >
+          切換文字選單
+        </Button>
         <div id="map-root" ref={this.rootRef}></div>
       </>
     );

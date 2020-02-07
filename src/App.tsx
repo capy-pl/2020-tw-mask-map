@@ -54,7 +54,7 @@ class App extends React.PureComponent<{}, State> {
   public pageLimit: number = 5;
 
   public state = {
-    ajaxError: true,
+    ajaxError: false,
     notFoundError: false,
     pharmacies: [],
     loading: true,
@@ -71,7 +71,7 @@ class App extends React.PureComponent<{}, State> {
     numberLeft: 0,
     availableNums: 0,
     pageNums: 0,
-    mapView: true
+    mapView: false
   };
 
   public async componentDidMount() {
@@ -397,6 +397,9 @@ class App extends React.PureComponent<{}, State> {
           <Icon name="location arrow" />
         </Button>
 
+        <Button className="toggle-map-icon" onClick={this.toggleMapView}>
+          切換Google地圖
+        </Button>
         <Menu style={{ zIndex: 0 }} borderless fixed="top" secondary>
           <Menu.Item>
             <Form onSubmit={this.onSubmit}>
@@ -410,12 +413,6 @@ class App extends React.PureComponent<{}, State> {
                 placeholder="搜尋藥局名稱或地址"
               />
             </Form>
-          </Menu.Item>
-          <Menu.Item
-            style={{ marginLeft: "3rem" }}
-            onClick={this.toggleMapView}
-          >
-            顯示Google地圖
           </Menu.Item>
         </Menu>
         <Segment id="main">
@@ -495,7 +492,10 @@ class App extends React.PureComponent<{}, State> {
           <Loader />
         </Dimmer>
         {this.state.mapView ? (
-          <GoogleMap pharmacies={this.state.pharmacies} />
+          <GoogleMap
+            toggleMapView={this.toggleMapView}
+            pharmacies={this.state.pharmacies}
+          />
         ) : (
           table
         )}

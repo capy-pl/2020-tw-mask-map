@@ -11,6 +11,13 @@
   z-index: 20;
 }
 
+.toggle-map-icon {
+  position: fixed !important;
+  bottom: 1rem;
+  right: 15rem;
+  z-index: 20;
+}
+
 #root {
   height: 100%;
 }
